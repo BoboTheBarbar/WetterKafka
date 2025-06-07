@@ -23,6 +23,9 @@ repositories {
     mavenCentral()
 }
 
+val mockitoAgent = configurations.create("mockitoAgent")
+val mockitoVersion = "5.12.0"
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.kafka:spring-kafka")
@@ -33,9 +36,13 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:kafka")
+    testImplementation("org.mockito:mockito-core:$mockitoVersion") // oder deine gewünschte Version
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    mockitoAgent("org.mockito:mockito-core:$mockitoVersion") { isTransitive = false }
 }
 
 tasks.withType<Test> {
+    jvmArgs?.add("-javaagent:${mockitoAgent.asPath}")
     useJUnitPlatform()
 }

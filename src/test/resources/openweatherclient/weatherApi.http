@@ -1,0 +1,8 @@
+@baseUrl = http://api.openweathermap.org
+@apiKey = f67c2dad94e8ba5c46368c818b7796ac
+@londonLon = 51.5073219
+@londonLat = -0.1276474
+
+### 1. Basic city search - London
+GET {{baseUrl}}/data/2.5/weather?lat={{londonLat}}&lon={{londonLon}}&appid={{apiKey}}
+Accept: application/json

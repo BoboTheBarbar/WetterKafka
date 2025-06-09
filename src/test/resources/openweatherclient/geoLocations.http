@@ -1,0 +1,47 @@
+### OpenWeather Geocoding API - Direct geocoding
+### Dokumentation: https://openweathermap.org/api/geocoding-api
+
+### Variables
+@baseUrl = http://api.openweathermap.org
+@apiKey = f67c2dad94e8ba5c46368c818b7796ac
+@limit = 5
+
+### 1. Basic city search - London
+GET {{baseUrl}}/geo/1.0/direct?q=London&limit={{limit}}&appid={{apiKey}}
+Accept: application/json
+
+### 2. City with country - London, GB
+GET {{baseUrl}}/geo/1.0/direct?q=London,GB&limit={{limit}}&appid={{apiKey}}
+Accept: application/json
+
+### 3. City with state and country - London,Ontario,CA
+GET {{baseUrl}}/geo/1.0/direct?q=London,Ontario,CA&limit={{limit}}&appid={{apiKey}}
+Accept: application/json
+
+### 4. German city - Berlin
+GET {{baseUrl}}/geo/1.0/direct?q=Berlin,DE&limit={{limit}}&appid={{apiKey}}
+Accept: application/json
+
+### 5. US city with state - New York, NY, US
+GET {{baseUrl}}/geo/1.0/direct?q=New York,NY,US&limit={{limit}}&appid={{apiKey}}
+Accept: application/json
+
+### 6. City with spaces - San Francisco
+GET {{baseUrl}}/geo/1.0/direct?q=San Francisco,CA,US&limit={{limit}}&appid={{apiKey}}
+Accept: application/json
+
+### 7. Limit to 1 result only
+GET {{baseUrl}}/geo/1.0/direct?q=Paris&limit=1&appid={{apiKey}}
+Accept: application/json
+
+### 8. Test your Spring Boot endpoint (localhost)
+GET http://localhost:8080/coordinates?city=London
+Accept: application/json
+
+### 9. Test your Spring Boot endpoint with state and country
+GET http://localhost:8080/coordinates?city=London&state=Ontario&country=CA
+Accept: application/json
+
+### 10. Test error handling - invalid city
+GET http://localhost:8080/coordinates?city=InvalidCityName12345
+Accept: application/json

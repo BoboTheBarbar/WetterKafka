@@ -5,8 +5,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 # Lokale Konfigurationsdateien
-application-local.properties
-application-local.yml
+**/application-local.yaml
+**/application-local.yml
+**/application-local.properties
 
 ### STS ###
 .apt_generated
@@ -38,3 +39,4 @@ out/
 
 ### VS Code ###
 .vscode/
+

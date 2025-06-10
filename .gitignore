@@ -4,6 +4,9 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+# Lokale Konfigurationsdateien
+application-local.properties
+application-local.yml
 
 ### STS ###
 .apt_generated

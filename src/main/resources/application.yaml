@@ -1,0 +1,9 @@
+spring:
+    application:
+        name: WetterKafka
+
+openweather:
+    api-key: "${OPENWEATHER_API_KEY:replace-me-in-your-profile}"
+    baseUrl: "http://api.openweathermap.org"
+    weatherByGeolocationEndpoint: "/data/2.5/weather"
+    geolocationByCityEndpoint: "/geo/1.0/direct"

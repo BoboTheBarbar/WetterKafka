@@ -1,8 +1,8 @@
 package de.training.wetterkafka.application.repositories;
 
-import de.training.wetterkafka.domain.GeoLocationDomain;
+import de.training.wetterkafka.gateway.mongodb.GeoLocationMongoDTO;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface GeoLocationRepository extends MongoRepository<GeoLocationDomain, String> {
-    GeoLocationDomain getByName(String name);
+public interface GeoLocationRepository extends MongoRepository<GeoLocationMongoDTO, String> {
+    GeoLocationMongoDTO getByName(String name);
 }

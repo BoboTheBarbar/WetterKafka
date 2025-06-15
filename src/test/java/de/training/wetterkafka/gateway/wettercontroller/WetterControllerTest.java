@@ -2,7 +2,7 @@ package de.training.wetterkafka.gateway.wettercontroller;
 
 import de.training.wetterkafka.application.GeoLocationService;
 import de.training.wetterkafka.application.repositories.GeoLocationRepository;
-import de.training.wetterkafka.domain.GeoLocationDomain;
+import de.training.wetterkafka.gateway.mongodb.GeoLocationMongoDTO;
 import de.training.wetterkafka.gateway.openweatherclient.GeoLocationAdapter;
 import de.training.wetterkafka.gateway.openweatherclient.OpenWeatherProperties;
 import de.training.wetterkafka.gateway.openweatherclient.RestClientConfig;
@@ -26,11 +26,9 @@ class WetterControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    // Option 1: Bean aus dem Application Context beziehen und als Spy verwenden
     @MockitoSpyBean
     private GeoLocationService geoLocationService;
 
-    // Repository mocken, da es von GeoLocationService verwendet wird
     @MockitoBean
     private GeoLocationRepository geoLocationRepository;
 
@@ -38,7 +36,7 @@ class WetterControllerTest {
     void getWetterByKnownCity() throws Exception {
         // Given
         String cityName = "Bonn";
-        GeoLocationDomain mockDomain = new GeoLocationDomain(cityName, 50.7374, 7.0982, "DE", "NRW");
+        var mockDomain = new GeoLocationMongoDTO(cityName, 50.7374, 7.0982, "DE", "NRW");
         when(geoLocationRepository.getByName(cityName)).thenReturn(mockDomain);
 
         // When & Than

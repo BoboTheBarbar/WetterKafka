@@ -11,9 +11,9 @@ import java.util.List;
  * MapStruct-Adapter für die Konvertierung zwischen GeoLocationOpenWeatherDTO und GeoLocationDomain
  */
 @Mapper
-public interface GeoLocationAdapter {
+public interface GeoLocationOpenWeatherAdapter {
 
-    GeoLocationAdapter INSTANCE = Mappers.getMapper(GeoLocationAdapter.class);
+    GeoLocationOpenWeatherAdapter GEO_LOCATION_OPEN_WEATHER_ADAPTER = Mappers.getMapper(GeoLocationOpenWeatherAdapter.class);
 
     // Basic mapping methods - MapStruct will generate these
     GeoLocationDomain toDomain(GeoLocationOpenWeatherDTO openWeatherDto);

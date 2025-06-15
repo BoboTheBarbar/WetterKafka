@@ -6,7 +6,7 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper
 public interface GeoLocationMongoAdapter {
-    GeoLocationMongoAdapter INSTANCE = Mappers.getMapper(GeoLocationMongoAdapter.class);
+    GeoLocationMongoAdapter GEO_LOCATION_MONGO_ADAPTER = Mappers.getMapper(GeoLocationMongoAdapter.class);
 
     GeoLocationDomain toGeoLocationDomain(GeoLocationMongoDTO geoLocationMongoDTO);
     GeoLocationMongoDTO toGeoLocationMongoDTO(GeoLocationDomain geoLocationDomain);

@@ -3,7 +3,7 @@ package de.training.wetterkafka.gateway.wettercontroller;
 import com.fasterxml.jackson.databind.JsonNode;
 import de.training.wetterkafka.application.GeoLocationService;
 import de.training.wetterkafka.domain.GeoLocationDomain;
-import de.training.wetterkafka.gateway.openweatherclient.GeoLocationAdapter;
+import de.training.wetterkafka.gateway.openweatherclient.GeoLocationOpenWeatherAdapter;
 import de.training.wetterkafka.gateway.openweatherclient.GeoLocationOpenWeatherDTO;
 import de.training.wetterkafka.gateway.openweatherclient.OpenWeatherProperties;
 import org.apache.logging.log4j.LogManager;
@@ -56,7 +56,7 @@ public class WetterController {
         if (location != null) {
             // Domain zu MongoDB DTO konvertieren
             logger.info("Found location in database: {}", cityName);
-            return GeoLocationAdapter.INSTANCE.toOpenWeatherDto(location);
+            return GeoLocationOpenWeatherAdapter.GEO_LOCATION_OPEN_WEATHER_ADAPTER.toOpenWeatherDto(location);
         }
 
         // Wenn nicht in DB gefunden, von OpenWeather API holen
@@ -93,12 +93,12 @@ public class WetterController {
     private void saveLocationToDatabase(GeoLocationOpenWeatherDTO mongoDto) {
         try {
             // OpenWeather DTO zu Domain konvertieren
-            GeoLocationDomain domain = GeoLocationAdapter.INSTANCE.toDomain(mongoDto);
+            GeoLocationDomain domain = GeoLocationOpenWeatherAdapter.GEO_LOCATION_OPEN_WEATHER_ADAPTER.toDomain(mongoDto);
             
             // Validierung
-            if (GeoLocationAdapter.INSTANCE.isValidDomain(domain)) {
+            if (GeoLocationOpenWeatherAdapter.GEO_LOCATION_OPEN_WEATHER_ADAPTER.isValidDomain(domain)) {
                 // Normalisierung anwenden
-                GeoLocationDomain normalizedDomain = GeoLocationAdapter.INSTANCE.normalize(domain);
+                GeoLocationDomain normalizedDomain = GeoLocationOpenWeatherAdapter.GEO_LOCATION_OPEN_WEATHER_ADAPTER.normalize(domain);
                 
                 // In Datenbank speichern
                 geoLocationService.save(normalizedDomain);

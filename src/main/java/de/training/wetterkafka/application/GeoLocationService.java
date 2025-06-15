@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GeoLocationService {
 
-    public static final GeoLocationMongoAdapter MONGO_ADAPTER = GeoLocationMongoAdapter.INSTANCE;
+    public static final GeoLocationMongoAdapter MONGO_ADAPTER = GeoLocationMongoAdapter.GEO_LOCATION_MONGO_ADAPTER;
 
     public GeoLocationService(GeoLocationRepository geoLocationRepository) {
         this.geoLocationRepository = geoLocationRepository;

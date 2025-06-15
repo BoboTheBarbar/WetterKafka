@@ -1,7 +1,7 @@
-package de.training.wetterkafka.gateway.mongodb;
+package de.training.wetterkafka.gateway.wettercontroller;
 
 import de.training.wetterkafka.domain.GeoLocationDomain;
-import de.training.wetterkafka.gateway.openweatherclient.GeoLocationAdapter;
+import de.training.wetterkafka.gateway.openweatherclient.GeoLocationOpenWeatherAdapter;
 import de.training.wetterkafka.gateway.openweatherclient.GeoLocationOpenWeatherDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,10 +12,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("GeoLocationAdapter Tests")
-class GeoLocationAdapterTest {
+class GeoLocationOpenWeatherAdapterTest {
 
-    private final GeoLocationAdapter adapter = GeoLocationAdapter.INSTANCE;
+    private final GeoLocationOpenWeatherAdapter adapter = GeoLocationOpenWeatherAdapter.GEO_LOCATION_OPEN_WEATHER_ADAPTER;
 
     @Nested
     @DisplayName("MongoDB DTO to Domain Conversion")

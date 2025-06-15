@@ -168,8 +168,8 @@ class GeoLocationAdapterTest {
         @DisplayName("Should return null when list is null")
         void shouldReturnNullWhenListIsNull() {
             // When & Then
-            assertThat(adapter.toDomainList(null)).isNull();
-            assertThat(adapter.toMongoDtoList(null)).isNull();
+            assertThat(adapter.toDomainList(null)).isEmpty();
+            assertThat(adapter.toMongoDtoList(null)).isEmpty();
         }
     }
 

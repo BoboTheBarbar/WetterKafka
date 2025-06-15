@@ -3,7 +3,6 @@ package de.training.wetterkafka.gateway.mongodb;
 import de.training.wetterkafka.domain.GeoLocationDomain;
 import de.training.wetterkafka.gateway.openweatherclient.GeoLocationAdapter;
 import de.training.wetterkafka.gateway.openweatherclient.GeoLocationOpenWeatherDTO;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,12 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("GeoLocationAdapter Tests")
 class GeoLocationAdapterTest {
 
-    private GeoLocationAdapter adapter;
-
-    @BeforeEach
-    void setUp() {
-        adapter = new GeoLocationAdapter();
-    }
+    private final GeoLocationAdapter adapter = GeoLocationAdapter.INSTANCE;
 
     @Nested
     @DisplayName("MongoDB DTO to Domain Conversion")
@@ -100,7 +94,7 @@ class GeoLocationAdapterTest {
             );
 
             // When
-            GeoLocationOpenWeatherDTO mongoDto = adapter.toMongoDto(domain);
+            GeoLocationOpenWeatherDTO mongoDto = adapter.toOpenWeatherDto(domain);
 
             // Then
             assertThat(mongoDto).isNotNull();
@@ -115,7 +109,7 @@ class GeoLocationAdapterTest {
         @DisplayName("Should return null when Domain is null")
         void shouldReturnNullWhenDomainIsNull() {
             // When
-            GeoLocationOpenWeatherDTO mongoDto = adapter.toMongoDto(null);
+            GeoLocationOpenWeatherDTO mongoDto = adapter.toOpenWeatherDto(null);
 
             // Then
             assertThat(mongoDto).isNull();
@@ -156,7 +150,7 @@ class GeoLocationAdapterTest {
             );
 
             // When
-            List<GeoLocationOpenWeatherDTO> mongoDtos = adapter.toMongoDtoList(domains);
+            List<GeoLocationOpenWeatherDTO> mongoDtos = adapter.toOpenWeatherDtoList(domains);
 
             // Then
             assertThat(mongoDtos).hasSize(2);
@@ -168,8 +162,8 @@ class GeoLocationAdapterTest {
         @DisplayName("Should return null when list is null")
         void shouldReturnNullWhenListIsNull() {
             // When & Then
-            assertThat(adapter.toDomainList(null)).isEmpty();
-            assertThat(adapter.toMongoDtoList(null)).isEmpty();
+            assertThat(adapter.toDomainList(null)).isNull();
+            assertThat(adapter.toOpenWeatherDtoList(null)).isNull();
         }
     }
 
@@ -264,8 +258,8 @@ class GeoLocationAdapterTest {
             );
 
             // When & Then
-            assertThat(adapter.isValidMongoDto(validDto)).isTrue();
-            assertThat(adapter.isValidMongoDto(invalidDto)).isFalse();
+            assertThat(adapter.isValidOpenWeatherDto(validDto)).isTrue();
+            assertThat(adapter.isValidOpenWeatherDto(invalidDto)).isFalse();
         }
     }
 
@@ -353,7 +347,7 @@ class GeoLocationAdapterTest {
             );
 
             // When - Round trip: Domain -> MongoDB DTO -> Domain
-            GeoLocationOpenWeatherDTO mongoDto = adapter.toMongoDto(originalDomain);
+            GeoLocationOpenWeatherDTO mongoDto = adapter.toOpenWeatherDto(originalDomain);
             GeoLocationDomain convertedBackDomain = adapter.toDomain(mongoDto);
 
             // Then
@@ -374,7 +368,7 @@ class GeoLocationAdapterTest {
 
             // When - Round trip: MongoDB DTO -> Domain -> MongoDB DTO
             GeoLocationDomain domain = adapter.toDomain(originalMongoDto);
-            GeoLocationOpenWeatherDTO convertedBackMongoDto = adapter.toMongoDto(domain);
+            GeoLocationOpenWeatherDTO convertedBackMongoDto = adapter.toOpenWeatherDto(domain);
 
             // Then
             assertThat(convertedBackMongoDto).isEqualTo(originalMongoDto);

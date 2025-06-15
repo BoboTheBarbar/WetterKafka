@@ -1,126 +1,76 @@
 package de.training.wetterkafka.gateway.openweatherclient;
 
 import de.training.wetterkafka.domain.GeoLocationDomain;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+import org.springframework.util.StringUtils;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
- * Adapter für die Konvertierung zwischen GeoLocationMongoDTO und GeoLocationDomain
+ * MapStruct-Adapter für die Konvertierung zwischen GeoLocationOpenWeatherDTO und GeoLocationDomain
  */
-@Component
-public class GeoLocationAdapter {
+@Mapper
+public interface GeoLocationAdapter {
 
-    public GeoLocationDomain toDomain(GeoLocationOpenWeatherDTO mongoDto) {
-        if (mongoDto == null) {
-            return null;
-        }
+    GeoLocationAdapter INSTANCE = Mappers.getMapper(GeoLocationAdapter.class);
 
-        return new GeoLocationDomain(
-                mongoDto.name(),
-                mongoDto.lat(),
-                mongoDto.lon(),
-                mongoDto.country(),
-                mongoDto.state()
-        );
-    }
+    // Basic mapping methods - MapStruct will generate these
+    GeoLocationDomain toDomain(GeoLocationOpenWeatherDTO openWeatherDto);
+    
+    GeoLocationOpenWeatherDTO toOpenWeatherDto(GeoLocationDomain domain);
+    
+    List<GeoLocationDomain> toDomainList(List<GeoLocationOpenWeatherDTO> openWeatherDtos);
+    
+    List<GeoLocationOpenWeatherDTO> toOpenWeatherDtoList(List<GeoLocationDomain> domains);
 
-    public GeoLocationOpenWeatherDTO toMongoDto(GeoLocationDomain domain) {
-        if (domain == null) {
-            return null;
-        }
-
-        return new GeoLocationOpenWeatherDTO(
-                domain.name(),
-                domain.lat(),
-                domain.lon(),
-                domain.country(),
-                domain.state()
-        );
-    }
-
-    public List<GeoLocationDomain> toDomainList(List<GeoLocationOpenWeatherDTO> mongoDtos) {
-        if (mongoDtos == null) {
-            return Collections.emptyList();
-        }
-
-        return mongoDtos.stream()
-                .map(this::toDomain)
-                .toList();
-    }
-
-    public List<GeoLocationOpenWeatherDTO> toMongoDtoList(List<GeoLocationDomain> domains) {
-        if (domains == null) {
-            return Collections.emptyList();
-        }
-
-        return domains.stream()
-                .map(this::toMongoDto)
-                .toList();
-    }
-
-    public boolean isValidDomain(GeoLocationDomain domain) {
+    default boolean isValidDomain(GeoLocationDomain domain) {
         if (domain == null) {
             return false;
         }
 
-        return domain.name() != null && !domain.name().trim().isEmpty() &&
+        return StringUtils.hasText(domain.name()) &&
                domain.lat() >= -90.0 && domain.lat() <= 90.0 &&
                domain.lon() >= -180.0 && domain.lon() <= 180.0 &&
-               domain.country() != null && !domain.country().trim().isEmpty();
+               StringUtils.hasText(domain.country());
     }
 
-    public boolean isValidMongoDto(GeoLocationOpenWeatherDTO mongoDto) {
-        if (mongoDto == null) {
+    default boolean isValidOpenWeatherDto(GeoLocationOpenWeatherDTO openWeatherDto) {
+        if (openWeatherDto == null) {
             return false;
         }
 
-        return mongoDto.name() != null && !mongoDto.name().trim().isEmpty() &&
-               mongoDto.lat() >= -90.0 && mongoDto.lat() <= 90.0 &&
-               mongoDto.lon() >= -180.0 && mongoDto.lon() <= 180.0 &&
-               mongoDto.country() != null && !mongoDto.country().trim().isEmpty();
+        return StringUtils.hasText(openWeatherDto.name()) &&
+               openWeatherDto.lat() >= -90.0 && openWeatherDto.lat() <= 90.0 &&
+               openWeatherDto.lon() >= -180.0 && openWeatherDto.lon() <= 180.0 &&
+               StringUtils.hasText(openWeatherDto.country());
     }
 
-    /**
-     * Erstellt eine normalisierte Version eines Domain-Objekts
-     * (Name trimmed, Country in Großbuchstaben)
-     *
-     * @param domain Das Domain-Objekt
-     * @return Normalisiertes Domain-Objekt
-     */
-    public GeoLocationDomain normalize(GeoLocationDomain domain) {
+    default GeoLocationDomain normalize(GeoLocationDomain domain) {
         if (domain == null) {
             return null;
         }
-
+        
         return new GeoLocationDomain(
-                domain.name().trim(),
+                domain.name() != null ? domain.name().trim() : null,
                 domain.lat(),
                 domain.lon(),
-                domain.country().toUpperCase().trim(),
+                domain.country() != null ? domain.country().toUpperCase().trim() : null,
                 domain.state() != null ? domain.state().trim() : null
         );
     }
 
-    /**
-     * Erstellt eine normalisierte Version eines MongoDB DTOs
-     * (Name trimmed, Country in Großbuchstaben)
-     *
-     * @param mongoDto Das MongoDB DTO
-     * @return Normalisiertes MongoDB DTO
-     */
-    public GeoLocationOpenWeatherDTO normalize(GeoLocationOpenWeatherDTO mongoDto) {
-        if (mongoDto == null) {
+    default GeoLocationOpenWeatherDTO normalize(GeoLocationOpenWeatherDTO openWeatherDto) {
+        if (openWeatherDto == null) {
             return null;
         }
-
+        
         return new GeoLocationOpenWeatherDTO(
-                mongoDto.name().trim(),
-                mongoDto.lat(),
-                mongoDto.lon(),
-                mongoDto.country().toUpperCase().trim(),
-                mongoDto.state() != null ? mongoDto.state().trim() : null
+                openWeatherDto.name() != null ? openWeatherDto.name().trim() : null,
+                openWeatherDto.lat(),
+                openWeatherDto.lon(),
+                openWeatherDto.country() != null ? openWeatherDto.country().toUpperCase().trim() : null,
+                openWeatherDto.state() != null ? openWeatherDto.state().trim() : null
         );
     }
 }

@@ -3,7 +3,6 @@ package de.training.wetterkafka.gateway.wettercontroller;
 import de.training.wetterkafka.application.GeoLocationService;
 import de.training.wetterkafka.application.repositories.GeoLocationRepository;
 import de.training.wetterkafka.gateway.mongodb.GeoLocationMongoDTO;
-import de.training.wetterkafka.gateway.openweatherclient.GeoLocationAdapter;
 import de.training.wetterkafka.gateway.openweatherclient.OpenWeatherProperties;
 import de.training.wetterkafka.gateway.openweatherclient.RestClientConfig;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(WetterController.class)
-@Import({RestClientConfig.class, OpenWeatherProperties.class, GeoLocationService.class, GeoLocationAdapter.class})
+@Import({RestClientConfig.class, OpenWeatherProperties.class, GeoLocationService.class})
 class WetterControllerTest {
 
     @Autowired

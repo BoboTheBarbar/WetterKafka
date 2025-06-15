@@ -19,18 +19,15 @@ import java.util.Arrays;
 @RestController
 public class WetterController {
     private final GeoLocationService geoLocationService;
-    private final GeoLocationAdapter geoLocationAdapter;
     private final RestClient restClient;
     private final OpenWeatherProperties properties;
 
     private static final Logger logger = LogManager.getLogger(WetterController.class);
 
     public WetterController(GeoLocationService geoLocationService, 
-                           GeoLocationAdapter geoLocationAdapter,
                            RestClient restClient, 
                            OpenWeatherProperties properties) {
         this.geoLocationService = geoLocationService;
-        this.geoLocationAdapter = geoLocationAdapter;
         this.restClient = restClient;
         this.properties = properties;
     }
@@ -59,7 +56,7 @@ public class WetterController {
         if (location != null) {
             // Domain zu MongoDB DTO konvertieren
             logger.info("Found location in database: {}", cityName);
-            return geoLocationAdapter.toMongoDto(location);
+            return GeoLocationAdapter.INSTANCE.toOpenWeatherDto(location);
         }
 
         // Wenn nicht in DB gefunden, von OpenWeather API holen
@@ -95,13 +92,13 @@ public class WetterController {
      */
     private void saveLocationToDatabase(GeoLocationOpenWeatherDTO mongoDto) {
         try {
-            // MongoDB DTO zu Domain konvertieren
-            GeoLocationDomain domain = geoLocationAdapter.toDomain(mongoDto);
+            // OpenWeather DTO zu Domain konvertieren
+            GeoLocationDomain domain = GeoLocationAdapter.INSTANCE.toDomain(mongoDto);
             
             // Validierung
-            if (geoLocationAdapter.isValidDomain(domain)) {
+            if (GeoLocationAdapter.INSTANCE.isValidDomain(domain)) {
                 // Normalisierung anwenden
-                GeoLocationDomain normalizedDomain = geoLocationAdapter.normalize(domain);
+                GeoLocationDomain normalizedDomain = GeoLocationAdapter.INSTANCE.normalize(domain);
                 
                 // In Datenbank speichern
                 geoLocationService.save(normalizedDomain);

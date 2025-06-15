@@ -1,7 +1,10 @@
 package de.training.wetterkafka.gateway.wettercontroller;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonNode;
+import de.training.wetterkafka.application.GeoLocationService;
+import de.training.wetterkafka.domain.GeoLocationDomain;
+import de.training.wetterkafka.gateway.openweatherclient.GeoLocationAdapter;
+import de.training.wetterkafka.gateway.openweatherclient.GeoLocationOpenWeatherDTO;
 import de.training.wetterkafka.gateway.openweatherclient.OpenWeatherProperties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,23 +15,30 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
 import java.util.Arrays;
-import java.util.List;
 
 @RestController
 public class WetterController {
+    private final GeoLocationService geoLocationService;
+    private final GeoLocationAdapter geoLocationAdapter;
     private final RestClient restClient;
     private final OpenWeatherProperties properties;
 
     private static final Logger logger = LogManager.getLogger(WetterController.class);
 
-    public WetterController(RestClient restClient, OpenWeatherProperties properties) {
+    public WetterController(GeoLocationService geoLocationService, 
+                           GeoLocationAdapter geoLocationAdapter,
+                           RestClient restClient, 
+                           OpenWeatherProperties properties) {
+        this.geoLocationService = geoLocationService;
+        this.geoLocationAdapter = geoLocationAdapter;
         this.restClient = restClient;
         this.properties = properties;
     }
 
     @GetMapping("/weather/{cityName}")
     public ResponseEntity<JsonNode> weather(@PathVariable String cityName) {
-        GeoLocation firstGeolocation = getGeolocationsByCityName(cityName).getFirst();
+        GeoLocationOpenWeatherDTO firstGeolocation = getGeolocationByCityName(cityName);
+
         JsonNode jsonNode = restClient.get().uri(
                         uriBuilder -> uriBuilder
                                 .path(properties.getWeatherByGeolocationEndpoint())
@@ -42,31 +52,66 @@ public class WetterController {
         return ResponseEntity.ok(jsonNode);
     }
 
-    private List<GeoLocation> getGeolocationsByCityName(String cityName) {
-        // TODO: Handle locations == null
-        GeoLocation[] locations =
-            restClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path(properties.getGeolocationByCityEndpoint())
-                            .queryParam("q", cityName)
-                            .queryParam("limit", 5)
-                            .queryParam("appid", properties.getApiKey())
-                            .build())
-                    .retrieve()
-                    .body(GeoLocation[].class);
+    private GeoLocationOpenWeatherDTO getGeolocationByCityName(String cityName) {
+        // Zuerst in der Datenbank suchen
+        GeoLocationDomain location = geoLocationService.findByName(cityName);
 
-        String formatted = "Retrieved %d geolocations".formatted(locations.length);
+        if (location != null) {
+            // Domain zu MongoDB DTO konvertieren
+            logger.info("Found location in database: {}", cityName);
+            return geoLocationAdapter.toMongoDto(location);
+        }
+
+        // Wenn nicht in DB gefunden, von OpenWeather API holen
+        logger.info("Location not found in database, fetching from OpenWeather API: {}", cityName);
+        
+        GeoLocationOpenWeatherDTO[] locations = restClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(properties.getGeolocationByCityEndpoint())
+                        .queryParam("q", cityName)
+                        .queryParam("limit", 5)
+                        .queryParam("appid", properties.getApiKey())
+                        .build())
+                .retrieve()
+                .body(GeoLocationOpenWeatherDTO[].class);
+
+        if (locations == null || locations.length == 0) {
+            throw new IllegalArgumentException("No locations found for city: " + cityName);
+        }
+
+        GeoLocationOpenWeatherDTO firstLocation = Arrays.asList(locations).getFirst();
+        
+        // API-Ergebnis in Datenbank speichern für zukünftige Anfragen
+        saveLocationToDatabase(firstLocation);
+        
+        String formatted = "Retrieved %d geolocations from API".formatted(locations.length);
         logger.info(formatted);
 
-        return Arrays.asList(locations);
+        return firstLocation;
+    }
+
+    /**
+     * Speichert eine Location von der API in der Datenbank
+     */
+    private void saveLocationToDatabase(GeoLocationOpenWeatherDTO mongoDto) {
+        try {
+            // MongoDB DTO zu Domain konvertieren
+            GeoLocationDomain domain = geoLocationAdapter.toDomain(mongoDto);
+            
+            // Validierung
+            if (geoLocationAdapter.isValidDomain(domain)) {
+                // Normalisierung anwenden
+                GeoLocationDomain normalizedDomain = geoLocationAdapter.normalize(domain);
+                
+                // In Datenbank speichern
+                geoLocationService.save(normalizedDomain);
+                logger.info("Saved location to database: {}", normalizedDomain.name());
+            } else {
+                logger.warn("Invalid domain data, not saving to database: {}", mongoDto.name());
+            }
+        } catch (Exception e) {
+            logger.error("Failed to save location to database: {}", mongoDto.name(), e);
+            // Fehler beim Speichern sollte die API-Antwort nicht beeinträchtigen
+        }
     }
 }
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-record GeoLocation(
-        String name,
-        double lat,
-        double lon,
-        String country,
-        String state
-) {}

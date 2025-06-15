@@ -25,6 +25,7 @@ repositories {
 
 val mockitoAgent = configurations.create("mockitoAgent")
 val mockitoVersion = "5.12.0"
+val mapStructVersion = "1.6.3"
 
 
 dependencies {
@@ -32,9 +33,14 @@ dependencies {
     implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    implementation("org.mapstruct:mapstruct:$mapStructVersion")
+
     compileOnly("org.projectlombok:lombok")
+
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    annotationProcessor("org.mapstruct:mapstruct-processor:$mapStructVersion")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.springframework.kafka:spring-kafka-test")
